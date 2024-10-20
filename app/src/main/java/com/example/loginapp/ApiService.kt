@@ -1,13 +1,18 @@
 package com.example.loginapp
+
+import com.example.loginapp.apiUsage.LoginRequest
 import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.PUT
 
 interface ApiService {
-    @GET("login/username/{username}/password/{password}")
-    fun login(@Path("username") username: String, @Path("password") password: String): Call<Void>
+    @POST("users/login")
+    fun login(@Body loginRequest: LoginRequest): Call<LoginResponse>
 
-    @GET("register/username/{username}/password/{password}")
-    fun register(@Path("username") username: String, @Path("password") password: String): Call<Void>
+    @POST("users/register")
+    fun register(@Body registerRequest: RegisterRequest): Call<Void>
+
+    //@PUT("users/username")
+    //fun updatePreferences(@Body preferencesRequest: PreferencesRequest): Call<Void> // Example if you need it later
 }
-

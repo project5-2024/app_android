@@ -61,7 +61,8 @@
                         android:text="Option 1"
                         android:textSize="18sp"
                         android:textColor="@color/black"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="8dp"
+                        />
 
                     <com.google.android.material.slider.Slider
                         android:id="@+id/slider_1"
@@ -69,7 +70,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -101,7 +103,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -133,7 +136,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -166,7 +170,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -198,7 +203,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -230,7 +236,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -262,7 +269,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -294,7 +302,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -327,7 +336,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -359,7 +369,8 @@
                         android:layout_height="wrap_content"
                         android:value="50"
                         android:valueFrom="1"
-                        android:valueTo="100" />
+                        android:valueTo="100"
+                        android:stepSize="1"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

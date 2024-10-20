@@ -6,14 +6,12 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import com.example.loginapp.apiUsage.LoginRequest
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
-
-
 
 class MainActivity : AppCompatActivity() {
     lateinit var usernameInput: EditText
@@ -55,10 +53,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun makeLoginRequest(username: String, password: String) {
-        val call = apiService.login(username, password)
+        val loginRequest = LoginRequest(username, password)
+        val call = apiService.login(loginRequest)
 
-        call.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        call.enqueue(object : Callback<LoginResponse> {
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
                     Log.i("Login", "Login successful!")
                     // Switch to HomeActivity on successful login
@@ -70,22 +69,26 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 Log.e("Login", "Error: ${t.message}")
             }
         })
     }
 
-
     private fun makeRegisterRequest(username: String, password: String) {
-        val call = apiService.register(username, password)
+        val registerRequest = RegisterRequest(username, password, is_admin = 1)
+
+        // Log the registerRequest to see what is being sent
+        Log.d("RegisterRequest", "Payload: $registerRequest")
+
+        val call = apiService.register(registerRequest)
 
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Log.i("Register", "Registration successful!")
                 } else {
-                    Log.e("Register", "Registration failed: ${response.code()}")
+                    Log.e("Register", "Registration failed: ${response.code()} - ${response.errorBody()?.string()}")
                 }
             }
 
@@ -94,4 +97,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+
 }
