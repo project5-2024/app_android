@@ -58,7 +58,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 1"
+                        android:text="Option 1: food"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp"
@@ -92,7 +92,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 2"
+                        android:text="Option 2: Music"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp" />
@@ -125,7 +125,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 3"
+                        android:text="Option 3: Food"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp" />
@@ -159,7 +159,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 4"
+                        android:text="Option 4: Travel"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp" />
@@ -192,7 +192,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 5"
+                        android:text="Option 5: Movies"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp" />
@@ -225,7 +225,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 6"
+                        android:text="Option 6: Technology"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp" />
@@ -258,7 +258,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 7"
+                        android:text="Option 7: Fitness"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp" />
@@ -291,7 +291,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 8"
+                        android:text="Option 8: Gaming"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp" />
@@ -325,7 +325,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 9"
+                        android:text="Option 9: Books"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp" />
@@ -358,7 +358,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option 10"
+                        android:text="Option 10: Fashion"
                         android:textSize="18sp"
                         android:textColor="@color/black"
                         android:layout_marginBottom="8dp" />
@@ -374,7 +374,16 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Done"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black"
+                android:padding="18dp"
+                android:layout_marginTop="15dp"
+                android:textSize="20sp"
+                android:id="@+id/done_btn"/>
 
 
 

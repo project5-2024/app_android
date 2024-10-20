@@ -1,10 +1,14 @@
 package com.example.loginapp
 
 import com.example.loginapp.apiUsage.LoginRequest
+import com.example.loginapp.apiUsage.LoginResponse
+import com.example.loginapp.apiUsage.RegisterRequest
+import com.example.loginapp.apiUsage.SetPreferencesRequest
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 
 interface ApiService {
     @POST("users/login")
@@ -13,6 +17,13 @@ interface ApiService {
     @POST("users/register")
     fun register(@Body registerRequest: RegisterRequest): Call<Void>
 
-    //@PUT("users/username")
-    //fun updatePreferences(@Body preferencesRequest: PreferencesRequest): Call<Void> // Example if you need it later
+
+    @PUT("users/{username}")
+    fun setPreferences(
+        @Path("username") username: String,
+        @Body preferencesRequest: SetPreferencesRequest
+        ): Call<Void>
+
+
+
 }

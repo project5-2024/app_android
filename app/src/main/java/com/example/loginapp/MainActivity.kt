@@ -7,6 +7,8 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import com.example.loginapp.apiUsage.LoginRequest
+import com.example.loginapp.apiUsage.LoginResponse
+import com.example.loginapp.apiUsage.RegisterRequest
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -59,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         call.enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
-                    Log.i("Login", "Login successful!")
+                    Log.i("Login", "Login successful!" )
                     // Switch to HomeActivity on successful login
                     val intent = Intent(this@MainActivity, HomeActivity::class.java)
                     startActivity(intent)
@@ -86,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
-                    Log.i("Register", "Registration successful!")
+                    Log.i("Register", "Registration successful!: ${response.code()} - ${response.message().toString()}")
                 } else {
                     Log.e("Register", "Registration failed: ${response.code()} - ${response.errorBody()?.string()}")
                 }

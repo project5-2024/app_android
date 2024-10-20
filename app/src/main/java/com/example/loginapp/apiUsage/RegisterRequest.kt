@@ -1,4 +1,4 @@
-package com.example.loginapp
+package com.example.loginapp.apiUsage
 
 data class RegisterRequest(
     val username: String,
