@@ -18,7 +18,7 @@ interface ApiService {
     fun register(@Body registerRequest: RegisterRequest): Call<Void>
 
 
-    @PUT("users/{username}")
+    @PUT("users/set_parameters/{username}")
     fun setPreferences(
         @Path("username") username: String,
         @Body preferencesRequest: SetPreferencesRequest

@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var loginBtn: Button
     lateinit var registerBtn: Button
     lateinit var apiService: ApiService
+    lateinit var username: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,14 +42,14 @@ class MainActivity : AppCompatActivity() {
 
         // Handle Login Button Click
         loginBtn.setOnClickListener {
-            val username = usernameInput.text.toString()
+             username = usernameInput.text.toString()
             val password = passwordInput.text.toString()
             makeLoginRequest(username, password)
         }
 
         // Handle Register Button Click
         registerBtn.setOnClickListener {
-            val username = usernameInput.text.toString()
+             username = usernameInput.text.toString()
             val password = passwordInput.text.toString()
             makeRegisterRequest(username, password)
         }
@@ -63,7 +64,9 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     Log.i("Login", "Login successful!" )
                     // Switch to HomeActivity on successful login
-                    val intent = Intent(this@MainActivity, HomeActivity::class.java)
+                    val intent = Intent(this@MainActivity, BroadcastActivity::class.java)
+                    intent.putExtra("username", username) // Pass the username here
+                    Log.d("MainActivity", "Passing username: $username")
                     startActivity(intent)
                     finish() // Optional: call finish() to close the current activity
                 } else {
@@ -89,6 +92,12 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Log.i("Register", "Registration successful!: ${response.code()} - ${response.message().toString()}")
+                    // Switch to HomeActivity on successful login
+                    val intent = Intent(this@MainActivity, HomeActivity::class.java)
+                    intent.putExtra("username", username) // Pass the username here
+                    Log.d("MainActivity", "Passing username: $username")
+                    startActivity(intent)
+                    finish() // Optional: call finish() to close the current activity
                 } else {
                     Log.e("Register", "Registration failed: ${response.code()} - ${response.errorBody()?.string()}")
                 }

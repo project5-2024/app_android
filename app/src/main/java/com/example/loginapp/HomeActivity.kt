@@ -27,6 +27,7 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var doneButton: Button
     private lateinit var apiService: ApiService
+    private lateinit var username: String  // Declare username here, but don't initialize it yet
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,11 +54,17 @@ class HomeActivity : AppCompatActivity() {
 
         apiService = retrofit.create(ApiService::class.java)
 
+        val username = intent.getStringExtra("username") // Ensure intent is not null
+
         // Set click listener for the Done button
         doneButton.setOnClickListener {
+            Log.d("HomeActivity", "Received username: $username")
             val preferences = getSliderValues()
-            val username = "jeff" // Replace with the actual username variable if available
-            makeSetPreferencesRequest(preferences, username)
+            if (username != null) {
+                makeSetPreferencesRequest(preferences, username)
+            } else {
+                Log.e("HomeActivity", "Username is null")
+            }
         }
 
     }
