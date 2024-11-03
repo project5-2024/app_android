@@ -1,4 +1,5 @@
 package com.example.loginapp;
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -97,6 +98,12 @@ class HomeActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Log.i("SetPreferences", "Preferences set successfully!")
+                    // Switch to HomeActivity on successful login
+                    val intent = Intent(this@HomeActivity, BroadcastActivity::class.java)
+                    intent.putExtra("username", username) // Pass the username here
+                    Log.d("HomeActivity", "Passing username: $username")
+                    startActivity(intent)
+                    finish() // Optional: call finish() to close the current activity
                 } else {
                     Log.e("SetPreferences", "Failed to set preferences: ${response.code()}")
                 }
