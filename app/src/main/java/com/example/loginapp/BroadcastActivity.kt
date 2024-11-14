@@ -13,6 +13,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -30,6 +31,7 @@ class BroadcastActivity : AppCompatActivity() {
 
     private val PERMISSION_REQUEST_CODE = 1001
     private val username by lazy { intent.getStringExtra("username") ?: "default_user" }
+    private val userId by lazy { intent.getStringExtra("userId") ?: "default_user" }
 
 
     // Bluetooth enabling result handler
@@ -62,6 +64,18 @@ class BroadcastActivity : AppCompatActivity() {
 
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
         checkPermissionsAndAdvertise()
+
+        // Find the button and set up an intent to go to PreferencesActivity
+        val goToPreferencesButton: Button = findViewById(R.id.go_to_preferences_button)
+        goToPreferencesButton.setOnClickListener {
+            val username = intent.getStringExtra("username")
+            val intent = Intent(this@BroadcastActivity, HomeActivity::class.java)
+            intent.putExtra("username", username) // Pass the username here
+            intent.putExtra("userId", userId)
+            Log.d("HomeActivity", "Passing username: $username")
+            startActivity(intent)
+            finish() // Optional: call finish() to close the current activity
+        }
     }
 
     override fun onResume() {
@@ -150,7 +164,7 @@ class BroadcastActivity : AppCompatActivity() {
         val data = AdvertiseData.Builder()
             .addServiceData(
                 android.os.ParcelUuid.fromString("0000FEAA-0000-1000-8000-00805F9B34FB"),
-                username.toByteArray(Charsets.UTF_8)
+                userId.toByteArray(Charsets.UTF_8)
             )
             .build()
 
@@ -170,7 +184,7 @@ class BroadcastActivity : AppCompatActivity() {
     private val advertiseCallback = object : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
             isAdvertising = true
-            Log.d("BroadcastActivity", "Advertising started successfully with username: $username")
+            Log.d("BroadcastActivity", "Advertising started successfully with userId: $userId")
         }
 
         override fun onStartFailure(errorCode: Int) {
