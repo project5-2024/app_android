@@ -40,7 +40,13 @@
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <Button
+        android:id="@+id/go_to_map_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go to Map"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center" />
 
 
     <!-- Button at the bottom to go to Preferences page -->
@@ -52,5 +58,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

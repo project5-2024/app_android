@@ -1,6 +1,7 @@
 package com.example.loginapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.AdvertiseCallback
@@ -12,12 +13,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -33,14 +34,13 @@ class BroadcastActivity : AppCompatActivity() {
     private val username by lazy { intent.getStringExtra("username") ?: "default_user" }
     private val userId by lazy { intent.getStringExtra("userId") ?: "default_user" }
 
-
     // Bluetooth enabling result handler
     private val bluetoothEnablingResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             Log.d("BroadcastActivity", "Bluetooth enabled by user, starting advertising.")
-            startAdvertising()
+            startTimedAdvertising()
         } else {
             Log.d("BroadcastActivity", "Bluetooth not enabled by user, cannot start advertising.")
             promptEnableBluetooth()
@@ -65,16 +65,24 @@ class BroadcastActivity : AppCompatActivity() {
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
         checkPermissionsAndAdvertise()
 
-        // Find the button and set up an intent to go to PreferencesActivity
+        // Button to navigate back to Preferences
         val goToPreferencesButton: Button = findViewById(R.id.go_to_preferences_button)
         goToPreferencesButton.setOnClickListener {
             val username = intent.getStringExtra("username")
             val intent = Intent(this@BroadcastActivity, HomeActivity::class.java)
             intent.putExtra("username", username) // Pass the username here
             intent.putExtra("userId", userId)
-            Log.d("HomeActivity", "Passing username: $username")
+            Log.d("BroadcastActivity", "Passing username: $username")
             startActivity(intent)
             finish() // Optional: call finish() to close the current activity
+        }
+
+        // Button to navigate to Google Map Activity
+        val goToMapButton: Button = findViewById(R.id.go_to_map_button)
+        goToMapButton.setOnClickListener {
+            val intent = Intent(this@BroadcastActivity, MapActivity::class.java)
+            Log.d("BroadcastActivity", "Navigating to MapActivity.")
+            startActivity(intent)
         }
     }
 
@@ -110,7 +118,6 @@ class BroadcastActivity : AppCompatActivity() {
         }
     }
 
-
     private fun requestRelevantRuntimePermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Log.d("BroadcastActivity", "Requesting Bluetooth permissions for Android 12+.")
@@ -120,7 +127,6 @@ class BroadcastActivity : AppCompatActivity() {
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT,
                     Manifest.permission.BLUETOOTH_ADVERTISE
-
                 ),
                 PERMISSION_REQUEST_CODE
             )
@@ -140,18 +146,42 @@ class BroadcastActivity : AppCompatActivity() {
             Log.d("BroadcastActivity", "Required Bluetooth permissions are missing.")
             requestRelevantRuntimePermissions()
         } else {
-            Log.d("BroadcastActivity", "Permissions granted, starting advertising.")
-            startAdvertising()
+            Log.d("BroadcastActivity", "Permissions granted, starting timed advertising.")
+            startTimedAdvertising()
         }
     }
 
-    private fun startAdvertising() {
-        if (!bluetoothAdapter.isEnabled) {
-            Log.d("BroadcastActivity", "Bluetooth is disabled, cannot start advertising.")
-            promptEnableBluetooth()
-            return
+    private fun startTimedAdvertising() {
+        val handlerThread = HandlerThread("BluetoothAdvertiserThread")
+        handlerThread.start()
+        val handler = Handler(handlerThread.looper)
+        val advertiseInterval = 1000L // 1-second interval
+
+        val runnable = object : Runnable {
+            override fun run() {
+                if (!bluetoothAdapter.isEnabled) {
+                    Log.d("BroadcastActivity", "Bluetooth is disabled, cannot start advertising.")
+                    promptEnableBluetooth()
+                    handlerThread.quitSafely() // Stop thread if Bluetooth is disabled
+                    return
+                }
+
+                if (!isAdvertising) {
+                    startAdvertising()
+                } else {
+                    stopAdvertising()
+                }
+
+                // Schedule the next execution
+                handler.postDelayed(this, advertiseInterval)
+            }
         }
 
+        handler.post(runnable)
+    }
+
+
+    private fun startAdvertising() {
         advertiser = bluetoothAdapter.bluetoothLeAdvertiser
         Log.d("BroadcastActivity", "Configuring advertising settings.")
 
@@ -159,6 +189,7 @@ class BroadcastActivity : AppCompatActivity() {
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
             .setConnectable(false)
             .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
+            .setTimeout(0) // Set to 0 for manual timing
             .build()
 
         val data = AdvertiseData.Builder()
@@ -179,6 +210,15 @@ class BroadcastActivity : AppCompatActivity() {
 
         Log.d("BroadcastActivity", "Starting Bluetooth LE advertising.")
         advertiser?.startAdvertising(settings, data, advertiseCallback)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun stopAdvertising() {
+        if (isAdvertising) {
+            Log.d("BroadcastActivity", "Stopping advertising.")
+            advertiser?.stopAdvertising(advertiseCallback)
+            isAdvertising = false
+        }
     }
 
     private val advertiseCallback = object : AdvertiseCallback() {
@@ -205,66 +245,6 @@ class BroadcastActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun requestLocationPermission() {
-        Log.d("BroadcastActivity", "Displaying dialog for location permission request.")
-        AlertDialog.Builder(this)
-            .setTitle("Location permission required")
-            .setMessage("Location access is required to scan for BLE devices.")
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                Log.d("BroadcastActivity", "User accepted location permission dialog.")
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    PERMISSION_REQUEST_CODE
-                )
-            }
-            .show()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    private fun requestBluetoothPermissions() {
-        Log.d("BroadcastActivity", "Displaying dialog for Bluetooth permissions request.")
-        AlertDialog.Builder(this)
-            .setTitle("Bluetooth permission required")
-            .setMessage("Bluetooth access is required to scan and connect to BLE devices.")
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                Log.d("BroadcastActivity", "User accepted Bluetooth permissions dialog.")
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(
-                        Manifest.permission.BLUETOOTH_SCAN,
-                        Manifest.permission.BLUETOOTH_CONNECT,
-                        Manifest.permission.BLUETOOTH_ADVERTISE
-
-                    ),
-                    PERMISSION_REQUEST_CODE
-                )
-            }
-            .show()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode != PERMISSION_REQUEST_CODE) return
-
-        val allGranted = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
-        if (allGranted) {
-            Log.d("BroadcastActivity", "All required permissions granted.")
-            startAdvertising()
-        } else {
-            Log.d("BroadcastActivity", "Some permissions were denied.")
-            requestBluetoothPermissions() // Re-request permissions if denied
-        }
-    }
-
 
     override fun onDestroy() {
         super.onDestroy()

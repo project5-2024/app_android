@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+
 }
 
 android {
@@ -48,6 +49,9 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.cardview.v7)
+    implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)
+    implementation(libs.volley)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -55,6 +59,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.glide.v4160)
     annotationProcessor(libs.compiler)
+
 
 
 
