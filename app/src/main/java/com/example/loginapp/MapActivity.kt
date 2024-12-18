@@ -80,7 +80,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun loadNearbyShops(location: Location) {
         val radius = 1000 // 1 km radius
-        val apiKey = "AIzaSyDMOr-Z3XYTZC8rt9DFopMioNAimNBav5M"
+        val apiKey = ""
 
         val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" +
                 "location=${location.latitude},${location.longitude}&radius=$radius&type=store&key=$apiKey"
