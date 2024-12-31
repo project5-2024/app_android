@@ -18,6 +18,7 @@ import android.os.HandlerThread
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Switch
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -29,6 +30,7 @@ class BroadcastActivity : AppCompatActivity() {
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private var advertiser: BluetoothLeAdvertiser? = null
     private var isAdvertising = false
+    private var geolocationEnabled = false
 
     private val PERMISSION_REQUEST_CODE = 1001
     private val username by lazy { intent.getStringExtra("username") ?: "default_user" }
@@ -65,6 +67,17 @@ class BroadcastActivity : AppCompatActivity() {
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
         checkPermissionsAndAdvertise()
 
+        val geolocationToggle: Switch = findViewById(R.id.geolocation_toggle)
+        geolocationToggle.setOnCheckedChangeListener { _, isChecked ->
+            geolocationEnabled = isChecked
+            if (isAdvertising) {
+                stopAdvertising()
+                startAdvertising()
+            } else {
+                startAdvertising()
+            }
+        }
+
         // Button to navigate back to Preferences
         val goToPreferencesButton: Button = findViewById(R.id.go_to_preferences_button)
         goToPreferencesButton.setOnClickListener {
@@ -81,7 +94,8 @@ class BroadcastActivity : AppCompatActivity() {
         val goToMapButton: Button = findViewById(R.id.go_to_map_button)
         goToMapButton.setOnClickListener {
             val intent = Intent(this@BroadcastActivity, MapActivity::class.java)
-            Log.d("BroadcastActivity", "Navigating to MapActivity.")
+            Log.d("BroadcastActivity", "Navigating to MapActivity. Passing username: $username")
+            intent.putExtra("username", username) // Pass the username here
             startActivity(intent)
         }
     }
@@ -155,7 +169,7 @@ class BroadcastActivity : AppCompatActivity() {
         val handlerThread = HandlerThread("BluetoothAdvertiserThread")
         handlerThread.start()
         val handler = Handler(handlerThread.looper)
-        val advertiseInterval = 1000L // 1-second interval
+        val advertiseInterval = 5000L // 1-second interval
 
         val runnable = object : Runnable {
             override fun run() {
@@ -189,13 +203,15 @@ class BroadcastActivity : AppCompatActivity() {
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
             .setConnectable(false)
             .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
-            .setTimeout(0) // Set to 0 for manual timing
+            .setTimeout(0)
             .build()
 
+        // Include geolocation toggle in advertised data
+        val geolocationState = if (geolocationEnabled) "1" else "0"
         val data = AdvertiseData.Builder()
             .addServiceData(
                 android.os.ParcelUuid.fromString("0000FEAA-0000-1000-8000-00805F9B34FB"),
-                userId.toByteArray(Charsets.UTF_8)
+                "$userId|$geolocationState".toByteArray(Charsets.UTF_8)
             )
             .build()
 
@@ -224,7 +240,7 @@ class BroadcastActivity : AppCompatActivity() {
     private val advertiseCallback = object : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
             isAdvertising = true
-            Log.d("BroadcastActivity", "Advertising started successfully with userId: $userId")
+            Log.d("BroadcastActivity", "Advertising started successfully with userId: $userId and geolocation: $geolocationEnabled")
         }
 
         override fun onStartFailure(errorCode: Int) {
@@ -262,4 +278,6 @@ class BroadcastActivity : AppCompatActivity() {
             advertiser?.stopAdvertising(advertiseCallback)
         }
     }
+
+
 }

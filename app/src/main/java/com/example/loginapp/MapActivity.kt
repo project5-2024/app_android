@@ -2,6 +2,7 @@ package com.example.loginapp
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -15,6 +16,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.loginapp.apiUsage.SetPreferencesRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -26,6 +28,10 @@ import com.google.android.gms.maps.model.MarkerOptions
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Objects
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -35,12 +41,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private val handler = Handler(Looper.getMainLooper())
     private val updateInterval: Long = 60000 // 1 minute in milliseconds
     private val distances = mutableMapOf<String, Float>()
-    private val preferences = mutableMapOf<String, Float>("music" to 0f, "food" to 0f, "travel" to 0f, "movies" to 0f, "technology" to 0f, "fitness" to 0f, "gaming" to 0f, "books" to 0f, "fashion" to 0f)
+    private val preferences = mutableMapOf<String, Int>("music" to 1, "food" to 1, "travel" to 1, "movies" to 1, "technology" to 1, "fitness" to 1, "gaming" to 1, "books" to 1, "fashion" to 1)
+    private lateinit var apiService: ApiService
+    private val username by lazy { intent.getStringExtra("username") ?: "default_user" }
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://185.94.45.58:7832/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        apiService = retrofit.create(ApiService::class.java)
 
         // Initialize location provider
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -85,7 +102,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun loadNearbyShops(location: Location) {
         val radius = 1000 // 1 km radius
-        val apiKey = ""
+        val apiKey = "AIzaSyDMOr-Z3XYTZC8rt9DFopMioNAimNBav5M"
 
         val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" +
                 "location=${location.latitude},${location.longitude}&radius=$radius&key=$apiKey"
@@ -108,6 +125,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         val lat = place.getJSONObject("geometry").getJSONObject("location").getDouble("lat")
                         val lng = place.getJSONObject("geometry").getJSONObject("location").getDouble("lng")
                         val latLng = LatLng(lat, lng)
+
 
                         // Calculate the distance
                         val myloc = Location("mylocation").apply {
@@ -160,6 +178,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                                 else -> null
                             }
+                            Log.d(name,type)
 
                             if (category != null) {
                                 poiCounter[category] = poiCounter.getOrDefault(category, 0) + 1
@@ -169,11 +188,26 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     // Update preferences
                     for ((category, count) in poiCounter) {
-                        val multiplier = count.toFloat() / radius
-                        preferences[category] = multiplier
+                        val multiplier = count.toFloat() / radius // Compute multiplier as a float
+                        preferences[category] = count // Store the raw count in preferences (to be scaled later)
                         Log.d("type count", "Category: $category, Count: $count, Multiplier: $multiplier")
                     }
-                    Log.d("Preferences multiplier", preferences.toString())
+
+// Find the maximum value in preferences
+                    val maxCount = preferences.values.maxOrNull() ?: 0
+
+// Scale preferences to make the maximum value 100
+                    if (maxCount > 0) {
+                        preferences.forEach { (category, value) ->
+                            preferences[category] = ((value.toFloat() / maxCount) * 100).toInt() // Scale and convert to integer
+                        }
+                    }
+
+// Log scaled preferences
+                    Log.d("Scaled Preferences", preferences.toString())
+                    Log.d("username", username)
+                    makeSetPreferencesRequest(preferences, username)
+
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -197,5 +231,29 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onStop() {
         super.onStop()
         handler.removeCallbacksAndMessages(null)
+    }
+
+
+    private fun makeSetPreferencesRequest(preferences: Map<String, Int>, username: String) {
+        val setPreferencesRequest = SetPreferencesRequest(preferences)
+        Log.d("SetPreferences", "Sending preferences: $preferences")
+        val call = apiService.setGeoPreferences(username, setPreferencesRequest)
+        Log.d("SetGeoPreferences", "Request URL: ${call.request().url()}")
+        Log.d("SetGeoPreferences", "Request URL: ${call.request()}")
+        call.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: retrofit2.Response<Void>) {
+                if (response.isSuccessful) {
+                    Log.i("SetGeoPreferences", "Preferences set successfully!")
+
+                    //finish()
+                } else {
+                    Log.e("SetGeoPreferences", "Failed to set preferences: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e("SetGeoPreferences", "Error setting preferences: ${t.message}")
+            }
+        })
     }
 }

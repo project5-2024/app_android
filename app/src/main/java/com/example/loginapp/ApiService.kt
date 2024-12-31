@@ -31,5 +31,19 @@ interface ApiService {
         @Path("userId") userId: String
     ): Call<GetPreferencesResponse>
 
+    @PUT("users/set_geo_parameters/{username}")
+    fun setGeoPreferences(
+        @Path("username") username: String,
+        @Body preferences: SetPreferencesRequest
+    ): Call<Void>
+
+    @POST("users/get_geo_parameters/{userId}")
+    fun getGeoPreferences(
+        @Path("userId") userId: String
+    ): Call<GetPreferencesResponse>
+
+
+
 }
 
+//curl -X PUT "http://185.94.45.58:7832/users/set_geo_parameters/name" -H "Content-Type: application/json" -d "{\"userdata\": {\"sports\": 12, \"music\": 20, \"food\": 23, \"travel\": 54, \"movies\": 64, \"technology\": 75, \"fitness\": 99, \"gaming\": 56, \"books\": 75, \"fashion\": 36}}"
