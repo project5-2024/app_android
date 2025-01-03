@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
         loginBtn = findViewById(R.id.login_btn)
         registerBtn = findViewById(R.id.register_btn)
 
-        // Initialize Retrofit
         val retrofit = Retrofit.Builder()
             .baseUrl("http://185.94.45.58:7832/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -41,14 +40,12 @@ class MainActivity : AppCompatActivity() {
 
         apiService = retrofit.create(ApiService::class.java)
 
-        // Handle Login Button Click
         loginBtn.setOnClickListener {
              username = usernameInput.text.toString()
             val password = passwordInput.text.toString()
             makeLoginRequest(username, password)
         }
 
-        // Handle Register Button Click
         registerBtn.setOnClickListener {
              username = usernameInput.text.toString()
             val password = passwordInput.text.toString()
@@ -66,19 +63,16 @@ class MainActivity : AppCompatActivity() {
                     val loginResponse = response.body()
                     Log.i("Login", "Login successful! Response: $loginResponse")
 
-                    // You can also log individual fields from the response if needed
                     Log.d("Login", "User ID: ${loginResponse?.userId}")
                     Log.d("Login", "Token: ${loginResponse?.token}")
 
-                    // Switch to HomeActivity on successful login
                     val intent = Intent(this@MainActivity, BroadcastActivity::class.java)
                     intent.putExtra("username", username)
                     intent.putExtra("userId", loginResponse?.userId) // Pass the username here
                     Log.d("MainActivity", "Passing username: $username")
                     startActivity(intent)
-                    finish() // Optional: call finish() to close the current activity
+                    finish() 
                 } else {
-                    // Log the error response details
                     Log.e("Login", "Login failed: ${response.code()} - ${response.errorBody()?.string()}")
                 }
             }
@@ -92,7 +86,6 @@ class MainActivity : AppCompatActivity() {
     private fun makeRegisterRequest(username: String, password: String) {
         val registerRequest = RegisterRequest(username, password, is_admin = 1)
 
-        // Log the registerRequest to see what is being sent
         Log.d("RegisterRequest", "Payload: $registerRequest")
 
         val call = apiService.register(registerRequest)
@@ -102,19 +95,14 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     Log.i("Register", "Registration successful!: ${response.code()} - ${response.message()}")
 
-                    // Assuming you get the 'userId' from the Login response after registration
-                    // You can pass the userId here if you know it is available after registration
-                    // For now, we'll just pass a placeholder userId (you can replace this with the actual ID)
+                    val placeholderUserId = "newUserId" 
 
-                    val placeholderUserId = "newUserId"  // Replace with actual logic to get userId if available
-
-                    // Switch to HomeActivity on successful registration
                     val intent = Intent(this@MainActivity, HomeActivity::class.java)
-                    intent.putExtra("username", username) // Pass the username here
-                    intent.putExtra("userId", placeholderUserId) // Pass the userId here
+                    intent.putExtra("username", username) 
+                    intent.putExtra("userId", placeholderUserId) 
                     Log.d("MainActivity", "Passing username: $username, userId: $placeholderUserId")
                     startActivity(intent)
-                    finish() // Optional: call finish() to close the current activity
+                    finish() 
                 } else {
                     Log.e("Register", "Registration failed: ${response.code()} - ${response.errorBody()?.string()}")
                 }
