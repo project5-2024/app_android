@@ -36,7 +36,6 @@ class BroadcastActivity : AppCompatActivity() {
     private val username by lazy { intent.getStringExtra("username") ?: "default_user" }
     private val userId by lazy { intent.getStringExtra("userId") ?: "default_user" }
 
-    // Bluetooth enabling result handler
     private val bluetoothEnablingResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -53,10 +52,8 @@ class BroadcastActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_broadcast)
 
-        // Find the ImageView for the ripple effect
         val rippleEffect: ImageView = findViewById(R.id.ripple_effect)
 
-        // Use Glide to load and animate the GIF
         Glide.with(this)
             .asGif()
             .load(R.drawable.ripple)
@@ -78,24 +75,22 @@ class BroadcastActivity : AppCompatActivity() {
             }
         }
 
-        // Button to navigate back to Preferences
         val goToPreferencesButton: Button = findViewById(R.id.go_to_preferences_button)
         goToPreferencesButton.setOnClickListener {
             val username = intent.getStringExtra("username")
             val intent = Intent(this@BroadcastActivity, HomeActivity::class.java)
-            intent.putExtra("username", username) // Pass the username here
+            intent.putExtra("username", username) 
             intent.putExtra("userId", userId)
             Log.d("BroadcastActivity", "Passing username: $username")
             startActivity(intent)
-            finish() // Optional: call finish() to close the current activity
+            finish() 
         }
 
-        // Button to navigate to Google Map Activity
         val goToMapButton: Button = findViewById(R.id.go_to_map_button)
         goToMapButton.setOnClickListener {
             val intent = Intent(this@BroadcastActivity, MapActivity::class.java)
             Log.d("BroadcastActivity", "Navigating to MapActivity. Passing username: $username")
-            intent.putExtra("username", username) // Pass the username here
+            intent.putExtra("username", username) 
             startActivity(intent)
         }
     }
@@ -169,14 +164,14 @@ class BroadcastActivity : AppCompatActivity() {
         val handlerThread = HandlerThread("BluetoothAdvertiserThread")
         handlerThread.start()
         val handler = Handler(handlerThread.looper)
-        val advertiseInterval = 5000L // 1-second interval
+        val advertiseInterval = 5000L 
 
         val runnable = object : Runnable {
             override fun run() {
                 if (!bluetoothAdapter.isEnabled) {
                     Log.d("BroadcastActivity", "Bluetooth is disabled, cannot start advertising.")
                     promptEnableBluetooth()
-                    handlerThread.quitSafely() // Stop thread if Bluetooth is disabled
+                    handlerThread.quitSafely() 
                     return
                 }
 
@@ -186,7 +181,6 @@ class BroadcastActivity : AppCompatActivity() {
                     stopAdvertising()
                 }
 
-                // Schedule the next execution
                 handler.postDelayed(this, advertiseInterval)
             }
         }
@@ -206,7 +200,6 @@ class BroadcastActivity : AppCompatActivity() {
             .setTimeout(0)
             .build()
 
-        // Include geolocation toggle in advertised data
         val geolocationState = if (geolocationEnabled) "1" else "0"
         val data = AdvertiseData.Builder()
             .addServiceData(
