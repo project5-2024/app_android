@@ -39,7 +39,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var googleMap: GoogleMap
     private val handler = Handler(Looper.getMainLooper())
-    private val updateInterval: Long = 60000 // 1 minute in milliseconds
+    private val updateInterval: Long = 60000 
     private val distances = mutableMapOf<String, Float>()
     private val preferences = mutableMapOf<String, Int>("music" to 1, "food" to 1, "travel" to 1, "movies" to 1, "technology" to 1, "fitness" to 1, "gaming" to 1, "books" to 1, "fashion" to 1)
     private lateinit var apiService: ApiService
@@ -59,17 +59,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         apiService = retrofit.create(ApiService::class.java)
 
-        // Initialize location provider
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Load the map
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this) // Call onMapReady when map is loaded
+        mapFragment.getMapAsync(this) /
     }
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
-        getCurrentLocation() // Fetch location after map is ready
+        getCurrentLocation() 
     }
 
     @SuppressLint("MissingPermission")
@@ -93,7 +91,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
                 googleMap.addMarker(MarkerOptions().position(currentLatLng).title("You are here"))
                 mylocation = currentLatLng
-                loadNearbyShops(location) // Load nearby places
+                loadNearbyShops(location) 
             } else {
                 Toast.makeText(this, "Unable to fetch location", Toast.LENGTH_SHORT).show()
             }
@@ -101,7 +99,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun loadNearbyShops(location: Location) {
-        val radius = 1000 // 1 km radius
+        val radius = 1000 
         val apiKey = "AIzaSyDMOr-Z3XYTZC8rt9DFopMioNAimNBav5M"
 
         val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" +
@@ -127,7 +125,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         val latLng = LatLng(lat, lng)
 
 
-                        // Calculate the distance
                         val myloc = Location("mylocation").apply {
                             latitude = location.latitude
                             longitude = location.longitude
@@ -186,24 +183,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
 
-                    // Update preferences
                     for ((category, count) in poiCounter) {
-                        val multiplier = count.toFloat() / radius // Compute multiplier as a float
-                        preferences[category] = count // Store the raw count in preferences (to be scaled later)
+                        val multiplier = count.toFloat() / radius 
+                        preferences[category] = count
                         Log.d("type count", "Category: $category, Count: $count, Multiplier: $multiplier")
                     }
 
-// Find the maximum value in preferences
                     val maxCount = preferences.values.maxOrNull() ?: 0
 
-// Scale preferences to make the maximum value 100
                     if (maxCount > 0) {
                         preferences.forEach { (category, value) ->
-                            preferences[category] = ((value.toFloat() / maxCount) * 100).toInt() // Scale and convert to integer
+                            preferences[category] = ((value.toFloat() / maxCount) * 100).toInt() 
                         }
                     }
 
-// Log scaled preferences
                     Log.d("Scaled Preferences", preferences.toString())
                     Log.d("username", username)
                     makeSetPreferencesRequest(preferences, username)
