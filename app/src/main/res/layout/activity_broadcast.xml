@@ -17,16 +17,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Transparent Ripple Effect GIF -->
         <ImageView
             android:id="@+id/ripple_effect"
             android:layout_gravity="center"
             android:layout_width="207dp"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ripple" /> <!-- Use the GIF file without extension -->
+            android:src="@drawable/ripple" /> 
 
-        <!-- Bluetooth Logo -->
         <ImageView
             android:id="@+id/bluetooth_logo"
             android:layout_width="wrap_content"
@@ -36,11 +34,7 @@
             android:layout_gravity="center" />
     </FrameLayout>
 
-    <!-- Map Button -->
 
-    <!-- Preferences Button -->
-
-    <!-- Geolocation Toggle (Switch) -->
     <Button
         android:id="@+id/go_to_map_button"
         android:layout_width="wrap_content"
