@@ -13,7 +13,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.example.loginapp.apiUsage.SetPreferencesRequest
-import com.example.loginapp.apiUsage.GetPreferencesResponse  // Response class for GET preferences
+import com.example.loginapp.apiUsage.GetPreferencesResponse 
 
 class HomeActivity : AppCompatActivity() {
 
@@ -37,7 +37,6 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        // Initialize the sliders and button
         slider1 = findViewById(R.id.slider_1)
         slider2 = findViewById(R.id.slider_2)
         slider3 = findViewById(R.id.slider_3)
@@ -50,7 +49,6 @@ class HomeActivity : AppCompatActivity() {
         slider10 = findViewById(R.id.slider_10)
         doneButton = findViewById(R.id.done_btn)
 
-        // Initialize Retrofit
         val retrofit = Retrofit.Builder()
             .baseUrl("http://185.94.45.58:7832/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -64,19 +62,17 @@ class HomeActivity : AppCompatActivity() {
         if (username.isNotEmpty()) {
             Log.d("GetPreferences user id",  userId)
             Log.d("GetPreferences username",  username)
-            getPreferences(userId)  // Load preferences when activity opens
+            getPreferences(userId)  
         } else {
             Log.e("HomeActivity", "Username is null or empty")
         }
 
-        // Set click listener for the Done button
         doneButton.setOnClickListener {
             val preferences = getSliderValues()
             makeSetPreferencesRequest(preferences, username)
         }
     }
 
-    // Function to retrieve preferences when activity is loaded
     private fun getPreferences(userId: String) {
         val call = apiService.getPreferences(userId)
         call.enqueue(object : Callback<GetPreferencesResponse> {
@@ -85,7 +81,6 @@ class HomeActivity : AppCompatActivity() {
                     Log.d("GetPreferences", "Raw response body: ${response.body()}")
                     val preferences = response.body()
                     if (preferences != null) {
-                        // Directly set the sliders based on the response
                         val prefsMap = mapOf(
                             "sports" to preferences.sports,
                             "music" to preferences.music,
@@ -115,7 +110,6 @@ class HomeActivity : AppCompatActivity() {
 
 
 
-    // Set sliders based on fetched preferences
     private fun setSliderValues(preferences: Map<String, Int>) {
         slider1.value = preferences["sports"]?.toFloat() ?: 0f
         slider2.value = preferences["music"]?.toFloat() ?: 0f
